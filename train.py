@@ -6,13 +6,13 @@ from models import create_model
 from utils.visualizer import save_visuals, create_writer
 import torch
 
-
 def main():
+    print("加载参数opt")
     opt = TrainOptions().parse()   # get training options
 
     torch.manual_seed(opt.seed)
     torch.cuda.manual_seed_all(opt.seed)
-
+    print("加载数据集")
     dataset = create_dataset(opt, mode=opt.train_split, shuffle=True)  # create a dataset given opt.dataset_mode and other options
     dataset_val = create_dataset(opt, mode=opt.val_epoch_split, shuffle=False)
     dataset_iterval = create_dataset(opt, mode=opt.val_split, shuffle=False)
@@ -23,10 +23,12 @@ def main():
     print(f'The number of validation data = {len(dataset_val)}')
     print(f'The number of test data = {len(dataset_test)}')
 
+    print("创建模型")
     model = create_model(opt)      # create a model given opt.model and other options
     current_epoch = model.setup(opt)               # regular setup: load and print networks; create schedulers
     total_iters = current_epoch * len(dataset.dataloader)      # the total number of training iterations
     writer = create_writer(opt)
+
     for epoch in range(current_epoch + 1, opt.n_epochs + 1):    # outer loop for different epochs
         epoch_start_time = time.time()  # timer for entire epoch
         iter_data_time = time.time()    # timer for data loading per iteration
